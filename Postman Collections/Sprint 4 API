@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   version: 1.0.0
-  title: Add Payment (Admin) and Purchase an Item (Customer)
+  title: Payment
 servers:
   - url: 'https://cusports.com'
 paths: 
