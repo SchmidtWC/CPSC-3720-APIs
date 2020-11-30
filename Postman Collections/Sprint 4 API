@@ -1,0 +1,218 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Add Payment (Admin) and Purchase an Item (Customer)
+servers:
+  - url: 'https://cusports.com'
+paths: 
+  /purchaseItem/user/{userID}/payment/{paymentMethod}/price/{price}:
+    get:
+      summary: "Validate an item purchase"
+      parameters:
+        - in: path
+          name: userID
+          description: userID
+          required: true
+          schema:
+              $ref: '#/components/schemas/User'
+        - in: path
+          name: paymentMethod
+          description: paymentMethod
+          required: true
+          schema:
+              $ref: '#/components/schemas/PaymentMethod'
+        - in: path
+          name: price
+          description: price
+          required: true
+          schema:
+              $ref: '#/components/schemas/Price'  
+      responses: #Ethan (Sprint 1), All (Sprint 2)
+        '200':
+          description: 'OK'
+          headers:
+            x-next:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: string
+        '401': #Ethan
+          description: 'Unauthorized. Please Log in to Make This Purchase.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404': #Conner
+          description: 'Syntax Error - User and payment method not found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '502':
+          description: 'Bad Gateway, cannot reach Server'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: 'Service Unavailable - Try Again Later'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '504':
+          description: 'Gateway Timeout - Could not connect to server.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '418': #joke
+          description: 'Im a Teapot'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /addPaymentMetod/user/{userID}:
+    get:
+      summary: 'Returns all the payment methods of the given user'
+      parameters:
+        - in: path
+          name: userID
+          description: userID
+          required: true
+          schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: 'A string stating if the given user, payment method, and price is logged as a valid purchase'
+          headers:
+            x-next:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+            description: Bad Request
+
+  /addPaymentMetod/user/{userID}/payment/{paymentMethod}:
+    post:
+      summary: 'Add a payment type to a user'
+      parameters:
+        - in: path
+          name: userID
+          required: true
+          schema:
+              $ref: '#/components/schemas/User'
+        - in: path
+          name: paymentMethod
+          required: true
+          schema:
+              $ref: '#/components/schemas/PaymentMethod'
+      requestBody:
+          required: true
+          content:
+              applicatoin/json:
+                schema:
+                  $ref: '#/components/schemas/PaymentMethod'
+      responses:
+        '201':
+          description: 'Request Completed Successfully and New Payment Type was Created/Added'
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: 'Syntax Error - Payment Method not Found - Could not be Added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: 'Conflict - Payment Method Previously Added. Please Change Method'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: 'Unexpected Error - Payment Method Could Not be Added'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: 'Service Unavailable - Try Again Later'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: 'deletePayment'
+      description: 'Deletes a selected payment method'
+      parameters:
+          - in: path
+            name: userID
+            required: true
+            schema:
+                $ref: '#/components/schemas/User'
+          - in: path
+            name: paymentMethod
+            required: true
+            schema:
+                $ref: '#/components/schemas/PaymentMethod'
+      responses:
+        '201':
+          description: 'Request Completed Successfully - Payment Type was Deleted'
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        tag:
+          type: string
+    Price:
+      properties:
+        itemNumber:
+            type: integer
+        itemPrice:
+            type: number
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    PaymentMethod: #Carson Wallace
+        properties:
+            paymentType:
+                type: string
